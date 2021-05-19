@@ -1,0 +1,48 @@
+body {
+  height: 100vh;
+  background-image: url(../img/Wasim_Muklashy_Photography_Yosemite_Tunnel_View_Wide_2880x1800.jpg); 
+ 
+  background-position: center center;
+  background-size: auto auto;
+  background-repeat: no-repeat;
+  background-color: rgb(27, 20, 20); 
+  position: relative;
+}
+
+#opacity {
+  background-color: red;
+  clip-path: inset(20px 20px 20px 20px);
+}
+
+.input-color {
+  padding: 0;
+  width: 20px;
+}
+
+.card-lists {
+  overflow-x: auto;
+}
+
+#cssmylove {
+  background-color: #633333;
+}
+
+.title {
+  color: black;
+  font-size: 3rem;
+  text-align: center;
+}
+
+#addListButton {
+  box-shadow: 2px 4px 10px 4px black;
+}
+
+#editTagsButton {
+  box-shadow: 2px 4px 10px 4px black;
+}
+
+/* .mycolumn{
+  border: black 5px solid;
+ 
+} */
+
