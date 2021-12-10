@@ -1,7 +1,7 @@
- /* const cardModule = require('./card');
+  const cardModule = require('./card');
  const listModule = require('./list');
- const tagModule = require('./tag'); */
-/*  const Sortable = require("sortablejs"); */
+ const tagModule = require('./tag'); 
+  const Sortable = require("sortablejs"); 
 
 
 // on objet qui contient des fonctions

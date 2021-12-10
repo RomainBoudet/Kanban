@@ -1,5 +1,5 @@
 const cardModule = require('./card');
- /* const Sortable = require("sortablejs"); */
+ const Sortable = require("sortablejs");
 
 
 const listModule = {
