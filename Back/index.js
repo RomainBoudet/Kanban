@@ -10,7 +10,7 @@ const router = require('./app/router');
 // d'être pls permissif sur l'origine des requetes !
 const cors = require('cors');
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3010;
 const app = express();
 
 // devrais nous permettre d'envoyer nos fichier static (qui servent au front) dans le dossier public au navigateur !
