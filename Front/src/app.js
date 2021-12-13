@@ -7,8 +7,9 @@
 // on objet qui contient des fonctions
 var app = {
   // l'url "de base" de notre api !
-  base_url: (document.location.protocol + '//' + document.location.hostname + ':3003'),
-  //base_url: "http://localhost:5050",
+  //base_url: (document.location.protocol + '//' + document.location.hostname + ':3003'),
+  //base_url: "http://localhost:3010",
+  base_url: process.env.BASE_URL,
 
 
 

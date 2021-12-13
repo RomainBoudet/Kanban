@@ -2,7 +2,7 @@
   "name": "okanban",
   "version": "1.0.0",
   "description": "## jour 4 : Implémentation",
-  "main": "test.js",
+  "main": "index.js",
   "directories": {
     "doc": "doc"
   },
@@ -23,13 +23,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/O-clock-FS-JS/oKanban.git"
+    "url": "git+https://github.com/RomainBoudet/Kanban"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/O-clock-FS-JS/oKanban/issues"
-  },
-  "homepage": "https://github.com/O-clock-FS-JS/oKanban#readme"
+  "homepage": "https://github.com/RomainBoudet/Kanban/blob/main/README.md"
 }
