@@ -1,5 +1,7 @@
 const dotenv = require('dotenv');
 dotenv.config();
+const fs = require('fs');
+const spdy = require('spdy');
 const multer = require('multer');
 const upload = multer();
 const express = require('express');
@@ -30,7 +32,17 @@ app.use(express.json());
 
 app.use(router);
 
+const options = {
+  key: fs.readFileSync(process.env.SSL_KEY_FILE),
+  cert: fs.readFileSync(process.env.SSL_CRT_FILE),
+};
 
-app.listen(PORT, () => {
+
+
+/* app.listen(PORT, () => {
+  console.log(`API Kanban Yosemite  Listening on ${PORT} ...`);
+}); */
+
+spdy.createServer(options, app).listen(port, () => {
   console.log(`API Kanban Yosemite  Listening on ${PORT} ...`);
 });
