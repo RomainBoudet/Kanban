@@ -12,7 +12,7 @@ const router = require('./app/router');
 // d'être pls permissif sur l'origine des requetes !
 const cors = require('cors');
 
-const PORT = process.env.PORT || 3010;
+const port = process.env.PORT || 3010;
 const app = express();
 
 // devrais nous permettre d'envoyer nos fichier static (qui servent au front) dans le dossier public au navigateur !
@@ -44,5 +44,5 @@ const options = {
 }); */
 
 spdy.createServer(options, app).listen(port, () => {
-  console.log(`API Kanban Yosemite  Listening on ${PORT} ...`);
+  console.log(`API Kanban Yosemite  Listening on ${port} ...`);
 });
