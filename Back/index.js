@@ -16,7 +16,7 @@ const port = process.env.PORT || 3010;
 const app = express();
 
 // devrais nous permettre d'envoyer nos fichier static (qui servent au front) dans le dossier public au navigateur !
-app.use(express.static('public'));  
+app.use(express.static('./public'));  
 
 
 app.use(cors());
@@ -32,9 +32,10 @@ app.use(express.json());
 
 app.use(router);
 
+
 const options = {
   key: fs.readFileSync(process.env.SSL_KEY_FILE),
-  cert: fs.readFileSync(process.env.SSL_CRT_FILE),
+  cert: fs.readFileSync(process.env.SSL_CERT_FILE),
 };
 
 
