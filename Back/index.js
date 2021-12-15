@@ -16,17 +16,33 @@ const port = process.env.PORT || 3010;
 const app = express();
 
 // devrais nous permettre d'envoyer nos fichier static (qui servent au front) dans le dossier public au navigateur !
-app.use(express.static('public'));  
+//app.use(express.static('public'));  
 
+app.use(cors({
+  optionsSuccessStatus: 200,
+  credentials: true, // pour envoyer des cookies et des en-têtes d'autorisations faut rajouter une autorisation avec l'option credential
+  origin: "*",//! a pas oublier pour la prod ! => remplacer par le bon nom de domaine
+  methods: "GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS", // ok via un array aussi
+  allowedHeaders: ['Content-Type'],
+}));
 
-app.use(cors());
 
 
 app.use(upload.array());
 app.use((req, res, next) => {
-  console.log('Server received : ', req.body);
+
+  console.log('Server received req.params : ', req.params);
+
+  console.log('Server received req.query : ', req.query);
+
+  console.log('Server received req.body : ', req.body);
   next();
 }); 
+
+
+app.use(express.urlencoded({
+  extended: true
+}));
 
 app.use(express.json());
 
