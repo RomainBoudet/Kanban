@@ -15,12 +15,13 @@
     "nodemon": "^2.0.15",
     "pg": "^8.7.1",
     "sequelize": "^6.12.0-beta.2",
+    "sortablejs": "^1.14.0",
     "spdy": "^4.0.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon index.js",
-    "build": "browserify ../Front/src/app.js -o ../Front/public/js/bundle.js"
+    "build": "browserify ./public/src/app.js -o ./public/js/bundle.js"
   },
   "repository": {
     "type": "git",

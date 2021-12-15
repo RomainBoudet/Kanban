@@ -16,7 +16,7 @@ const port = process.env.PORT || 3010;
 const app = express();
 
 // devrais nous permettre d'envoyer nos fichier static (qui servent au front) dans le dossier public au navigateur !
-app.use(express.static('./public'));  
+app.use(express.static('public'));  
 
 
 app.use(cors());
