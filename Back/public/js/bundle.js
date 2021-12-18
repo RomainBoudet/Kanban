@@ -1,466 +1,765 @@
-! function e(t, a, r) {
-    function o(d, s) {
-        if (!a[d]) {
-            if (!t[d]) {
-                var i = "function" == typeof require && require;
-                if (!s && i) return i(d, !0);
-                if (l) return l(d, !0);
-                var n = new Error("Cannot find module '" + d + "'");
-                throw n.code = "MODULE_NOT_FOUND", n
-            }
-            var c = a[d] = {
-                exports: {}
-            };
-            t[d][0].call(c.exports, (function (e) {
-                return o(t[d][1][e] || e)
-            }), c, c.exports, e, t, a, r)
-        }
-        return a[d].exports
-    }
-    for (var l = "function" == typeof require && require, d = 0; d < r.length; d++) o(r[d]);
-    return o
-}({
-    1: [function (e, t, a) {
-        const r = e("./card"),
-            o = e("./list"),
-            l = e("./tag");
-        var d = {
-            base_url: document.location.protocol + "//" + document.location.hostname + ":3010",
-            init: function () {
-                o.setBaseUrl(d.base_url), r.setBaseUrl(d.base_url), l.setBaseUrl(d.base_url), d.addListenerToActions(), d.getListsFromAPI()
-            },
-            addListenerToActions: () => {
-                document.getElementById("addListButton").addEventListener("click", o.showAddModal);
-                let e = document.querySelectorAll(".close");
-                for (let t of e) t.addEventListener("click", d.hideModals);
-                document.querySelector("#addListModal form").addEventListener("submit", d.handleAddListForm), document.querySelector("#addCardModal form").addEventListener("submit", d.handleAddCardForm), document.getElementById("editTagsButton").addEventListener("click", l.showEditModal), document.getElementById("newTagForm").addEventListener("submit", l.handleNewTag)
-            },
-            hideModals: () => {
-                let e = document.querySelectorAll(".modal");
-                for (let t of e) t.classList.remove("is-active")
-            },
-            handleAddListForm: async e => {
-                e.preventDefault(), await o.handleAddFormSubmit(e), d.hideModals()
-            },
-            handleAddCardForm: async e => {
-                e.preventDefault(), await r.handleAddFormSubmit(e), d.hideModals()
-            },
-            getListsFromAPI: async () => {
-                try {
-                    let e = await fetch(d.base_url + "/lists");
-                    if (200 !== e.status) {
-                        throw await e.json()
-                    } {
-                        let t = await e.json();
-                        for (let e of t) {
-                            let t = o.makeListDOMObject(e.name, e.id);
-                            o.addListToDOM(t);
-                            for (let t of e.cards) {
-                                let a = r.makeCardDOMObject(t.content, t.id, t.color);
-                                r.addCardToDOM(a, e.id);
-                                for (let e of t.tags) {
-                                    let a = l.makeTagDOMObject(e.name, e.color, e.id, t.id);
-                                    l.addTagToDOM(a, t.id)
-                                }
-                            }
-                        }
-                    }
-                    let t = document.querySelector(".card-lists");
-                    new Sortable(t, {
-                        group: "project",
-                        draggable: ".panel",
-                        onEnd: o.handleDropList
-                    })
-                } catch (e) {
-                    alert("Impossible de charger les listes depuis l'API."), console.error(e)
-                }
-            }
-        };
-        document.addEventListener("DOMContentLoaded", d.init)
-    }, {
-        "./card": 2,
-        "./list": 3,
-        "./tag": 4
-    }],
-    2: [function (e, t, a) {
-        const r = e("./tag"),
-            o = {
-                base_url: null,
-                setBaseUrl: e => {
-                    o.base_url = e + "/cards"
-                },
-                showAddModal: e => {
-                    let t = e.target.closest(".panel");
-                    console.log("listElement => ", t);
-                    const a = t.getAttribute("list-id");
-                    let r = document.getElementById("addCardModal");
-                    r.querySelector('input[name="list_id"]').value = a, r.classList.add("is-active")
-                },
-                handleAddFormSubmit: async e => {
-                    let t = new FormData(e.target);
-                    for (const e of t.entries()) console.log("les clés - valeurs de mon formdata => ", e[0] + ", " + e[1]);
-                    try {
-                        let e = await fetch(o.base_url, {
-                            method: "POST",
-                            body: t
-                        });
-                        if (200 != e.status) {
-                            throw await e.json()
-                        } {
-                            let t = await e.json(),
-                                a = o.makeCardDOMObject(t.content, t.id, t.color);
-                            o.addCardToDOM(a, t.list_id)
-                        }
-                    } catch (e) {
-                        alert("Impossible de créer une carte"), console.error(e)
-                    }
-                },
-                showEditForm: e => {
-                    let t = e.target.closest(".box"),
-                        a = t.querySelector("form"),
-                        r = t.querySelector(".card-name");
-                    a.querySelector('input[name="content"]').value = r.textContent, a.querySelector('input[name="color"]').value = o.rgb2hex(t.style.backgroundColor), r.classList.add("is-hidden"), a.classList.remove("is-hidden")
-                },
-                handleEditCardForm: async e => {
-                    e.preventDefault();
-                    let t = new FormData(e.target),
-                        a = e.target.closest(".box");
-                    const r = a.getAttribute("card-id");
-                    try {
-                        let e = await fetch(o.base_url + "/" + r, {
-                            method: "PATCH",
-                            body: t
-                        });
-                        if (200 !== e.status) {
-                            throw await e.json()
-                        } {
-                            let t = await e.json();
-                            a.querySelector(".card-name").textContent = t.content, a.style.backgroundColor = t.color
-                        }
-                    } catch (e) {
-                        alert("Impossible de modifier la carte"), console.error(e)
-                    }
-                    e.target.classList.add("is-hidden"), a.querySelector(".card-name").classList.remove("is-hidden")
-                },
-                makeCardDOMObject: (e, t, a) => {
-                    let l = document.getElementById("template-card"),
-                        d = document.importNode(l.content, !0);
-                    d.querySelector(".card-name").textContent = e;
-                    let s = d.querySelector(".box");
-                    return s.setAttribute("card-id", t), s.setAttribute("style", "background-color: " + a), d.querySelector(".button--edit-card").addEventListener("click", o.showEditForm), d.querySelector("form").addEventListener("submit", o.handleEditCardForm), d.querySelector(".button--delete-card").addEventListener("click", o.deleteCard), d.querySelector(".button--add-tag").addEventListener("click", r.showAssociateModal), d
-                },
-                addCardToDOM: (e, t) => {
-                    document.querySelector(`[list-id="${t}"]`).querySelector(".panel-block").appendChild(e)
-                },
-                deleteCard: async e => {
-                    if (!confirm("Supprimer cette carte ?")) return;
-                    let t = e.target.closest(".box");
-                    const a = t.getAttribute("card-id");
-                    try {
-                        let e = await fetch(o.base_url + "/" + a, {
-                            method: "DELETE"
-                        });
-                        if (!e.ok) {
-                            throw await e.json()
-                        }
-                        t.remove()
-                    } catch (e) {
-                        alert("Impossible de supprimer la carte"), console.error(e)
-                    }
-                },
-                rgb2hex: e => {
-                    if ("#" === e.charAt(0)) return e;
-                    let t = e.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?\)$/);
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+ const cardModule = require('./card');
+ const listModule = require('./list');
+ const tagModule = require('./tag');
+/*  const Sortable = require("sortablejs"); */
 
-                    function a(e) {
-                        return ("0" + parseInt(e).toString(16)).slice(-2)
-                    }
-                    return "#" + a(t[1]) + a(t[2]) + a(t[3])
-                }
-            };
-        t.exports = o
-    }, {
-        "./tag": 4
-    }],
-    3: [function (e, t, a) {
-        const r = e("./card"),
-            o = {
-                base_url: null,
-                setBaseUrl: e => {
-                    o.base_url = e + "/lists"
-                },
-                showAddModal: () => {
-                    document.getElementById("addListModal").classList.add("is-active")
-                },
-                handleAddFormSubmit: async e => {
-                    let t = new FormData(e.target),
-                        a = document.querySelectorAll(".panel").length;
-                    t.set("page_order", a);
-                    try {
-                        let e = await fetch(o.base_url, {
-                            method: "POST",
-                            body: t
-                        });
-                        if (200 !== e.status) {
-                            throw await e.json()
-                        } {
-                            const t = await e.json();
-                            let a = o.makeListDOMObject(t.name, t.id);
-                            o.addListToDOM(a)
-                        }
-                    } catch (e) {
-                        alert("Impossible de créer une liste"), console.error(e)
-                    }
-                },
-                showEditForm: e => {
-                    let t = e.target.closest(".panel").querySelector("form");
-                    t.querySelector('input[name="name"]').value = e.target.textContent, e.target.classList.add("is-hidden"), t.classList.remove("is-hidden")
-                },
-                handleEditListForm: async e => {
-                    e.preventDefault();
-                    let t = new FormData(e.target),
-                        a = e.target.closest(".panel");
-                    const r = a.getAttribute("list-id");
-                    try {
-                        let e = await fetch(o.base_url + "/" + r, {
-                            method: "PATCH",
-                            body: t
-                        });
-                        if (200 !== e.status) {
-                            throw await e.json()
-                        } {
-                            let t = await e.json();
-                            a.querySelector("h2").textContent = t.name
-                        }
-                    } catch (e) {
-                        alert("Impossible de modifier la liste"), console.error(e)
-                    }
-                    e.target.classList.add("is-hidden"), a.querySelector("h2").classList.remove("is-hidden")
-                },
-                makeListDOMObject: (e, t) => {
-                    let a = document.getElementById("template-list"),
-                        l = document.importNode(a.content, !0);
-                    l.querySelector("h2").textContent = e, l.querySelector(".panel").setAttribute("list-id", t), l.querySelector(".button--add-card").addEventListener("click", r.showAddModal),
-                        //!
-                        l.querySelector("h2").addEventListener("dblclick", o.showEditForm), l.querySelector("form").addEventListener("submit", o.handleEditListForm), l.querySelector(".button--delete-list").addEventListener("click", o.deleteList);
-                    let d = l.querySelector(".panel-block");
-                    return new Sortable(d, {
-                        group: "list",
-                        draggable: ".box",
-                        onEnd: o.handleDropCard
-                    }), l
-                },
-                addListToDOM: e => {
-                    document.querySelector(".card-lists").append(e), document.querySelector(".card-lists").scrollTo(document.querySelector(".card-lists").offsetWidth, 0)
-                },
-                deleteList: async e => {
-                    let t = e.target.closest(".panel");
-                    const a = t.getAttribute("list-id");
-                    if (t.querySelectorAll(".box").length) alert("Impossible de supprimer une liste non vide");
-                    else if (confirm("Supprimer cette liste ?")) try {
-                        let e = await fetch(o.base_url + "/" + a, {
-                            method: "DELETE"
-                        });
-                        if (!e.ok) {
-                            throw await e.json()
-                        }
-                        t.remove()
-                    } catch (e) {
-                        alert("Impossible de supprimer la liste."), console.log(e)
-                    }
-                },
-                updateAllLists: () => {
-                    document.querySelectorAll(".panel").forEach(((e, t) => {
-                        const a = e.getAttribute("list-id");
-                        let r = new FormData;
-                        r.set("position", t), fetch(o.base_url + "/" + a, {
-                            method: "PATCH",
-                            body: r
-                        })
-                    }))
-                },
-                updateAllCards: (e, t) => {
-                    e.forEach(((e, a) => {
-                        const o = e.getAttribute("card-id");
-                        let l = new FormData;
-                        l.set("position", a), l.set("list_id", t), fetch(r.base_url + "/" + o, {
-                            method: "PATCH",
-                            body: l
-                        })
-                    }))
-                },
-                handleDropCard: e => {
-                    e.item;
-                    let t = e.from,
-                        a = e.to,
-                        r = t.querySelectorAll(".box"),
-                        l = t.closest(".panel").getAttribute("list-id");
-                    o.updateAllCards(r, l), t !== a && (r = a.querySelectorAll(".box"), l = a.closest(".panel").getAttribute("list-id"), o.updateAllCards(r, l))
-                },
-                handleDropList: e => {
-                    o.updateAllLists()
-                }
-            };
-        t.exports = o
-    }, {
-        "./card": 2
-    }],
-    4: [function (e, t, a) {
-        const r = {
-            base_url: null,
-            setBaseUrl: e => {
-                r.base_url = e
-            },
-            makeTagDOMObject: (e, t, a, o) => {
-                let l = document.createElement("div");
-                return l.classList.add("tag"), l.setAttribute("style", "font-weight: bold; color:white"), l.style.backgroundColor = t, l.textContent = e, l.setAttribute("tag-id", a), l.setAttribute("card-id", o), l.addEventListener("dblclick", r.disassociateTag), l
-            },
-            addTagToDOM: (e, t) => {
-                document.querySelector(`[card-id="${t}"] .tags`).appendChild(e)
-            },
-            showAssociateModal: async e => {
-                const t = e.target.closest(".box").getAttribute("card-id"),
-                    a = document.getElementById("associateTagModal");
-                try {
-                    let e = await fetch(r.base_url + "/tags");
-                    if (!e.ok) {
-                        throw await e.json()
-                    } {
-                        let o = await e.json(),
-                            l = document.createElement("section");
-                        l.classList.add("modal-card-body");
-                        for (let e of o) {
-                            let a = r.makeTagDOMObject(e.name, e.color, e.id, t);
-                            a.addEventListener("click", r.handleAssociateTag), l.appendChild(a)
-                        }
-                        a.querySelector(".modal-card-body").replaceWith(l), a.classList.add("is-active")
-                    }
-                } catch (e) {
-                    alert("Impossible de récupérer les tags"), console.error(e)
-                }
-            },
-            handleAssociateTag: async e => {
-                const t = e.target.getAttribute("tag-id"),
-                    a = e.target.getAttribute("card-id");
-                console.log("cardId => ", a);
-                try {
-                    let e = new FormData;
-                    e.set("tagid", t);
-                    for (const t of e.entries()) console.log("les clés - valeurs de mon formdata => ", t[0] + ", " + t[1]);
-                    let o = await fetch(r.base_url + `/cards/${a}/tags`, {
-                        method: "POST",
-                        body: e
-                    });
-                    if (!o.ok) {
-                        throw await o.json()
-                    } {
-                        let e = await o.json(),
-                            t = document.querySelectorAll(`[card-id="${e.id}"] .tag`);
-                        for (let e of t) e.remove();
-                        let a = document.querySelector(`[card-id="${e.id}"] .tags`);
-                        for (let t of e.tags) {
-                            let o = r.makeTagDOMObject(t.name, t.color, t.id, e.id);
-                            a.appendChild(o)
-                        }
-                    }
-                } catch (e) {
-                    alert("Impossible d'associer le tag"), console.error(e)
-                }
-                document.getElementById("associateTagModal").classList.remove("is-active")
-            },
-            disassociateTag: async e => {
-                const t = e.target.getAttribute("tag-id"),
-                    a = e.target.getAttribute("card-id");
-                try {
-                    let o = await fetch(r.base_url + `/cards/${a}/tags/${t}`, {
-                        method: "DELETE"
-                    });
-                    if (!o.ok) {
-                        throw await o.json()
-                    }
-                    e.target.remove()
-                } catch (e) {
-                    alert("Impossible de désassocier le tag"), console.error(e)
-                }
-            },
-            makeEditTagForm: e => {
-                let t = document.getElementById("newTagForm"),
-                    a = document.importNode(t, !0);
-                a.setAttribute("id", null), a.classList.add("editTagForm"), a.querySelector('[name="name"]').value = e.name, a.querySelector('[name="color"]').value = e.color, console.log(e.color, a.querySelector('[name="color"]').value), a.setAttribute("tag-id", e.id), a.addEventListener("submit", r.handleEditTag);
-                let o = document.createElement("div");
-                return o.classList.add("button", "is-small", "is-danger"), o.textContent = "Supprimer", o.addEventListener("click", r.handleDeleteTag), a.querySelector(".field").appendChild(o), a
-            },
-            showEditModal: async () => {
-                try {
-                    let e = await fetch(r.base_url + "/tags");
-                    const t = document.getElementById("addAndEditTagModal");
-                    let a = await e.json(),
-                        o = document.createElement("div");
-                    o.classList.add("editTagForms");
-                    for (let e of a) {
-                        let t = r.makeEditTagForm(e);
-                        o.appendChild(t)
-                    }
-                    t.querySelector(".editTagForms").replaceWith(o), t.classList.add("is-active")
-                } catch (e) {
-                    alert("Impossible de récupérer les tags"), console.error(e)
-                }
-            },
-            handleNewTag: async e => {
-                e.preventDefault();
-                let t = new FormData(e.target);
-                try {
-                    let e = await fetch(r.base_url + "/tags", {
-                        method: "POST",
-                        body: t
-                    });
-                    if (!e.ok) {
-                        throw await e.json()
-                    }
-                } catch (e) {
-                    alert("Impossible de créer le tag"), console.error(e)
-                }
-                document.getElementById("addAndEditTagModal").classList.remove("is-active")
-            },
-            handleEditTag: async e => {
-                e.preventDefault();
-                let t = new FormData(e.target),
-                    a = e.target.getAttribute("tag-id");
-                try {
-                    let e = await fetch(r.base_url + "/tags/" + a, {
-                        method: "PATCH",
-                        body: t
-                    });
-                    if (!e.ok) {
-                        throw await e.json()
-                    } {
-                        let t = await e.json(),
-                            a = document.querySelectorAll(`[tag-id="${t.id}"]`);
-                        for (let e of a) e.textContent = t.name, e.style.backgroundColor = t.color
-                    }
-                } catch (e) {
-                    alert("Impossible de mettre le tag à jour"), console.error(e)
-                }
-                document.getElementById("addAndEditTagModal").classList.remove("is-active")
-            },
-            handleDeleteTag: async e => {
-                const t = e.target.closest("form").getAttribute("tag-id");
-                try {
-                    let e = await fetch(r.base_url + "/tags/" + t, {
-                        method: "DELETE"
-                    });
-                    if (!e.ok) {
-                        throw await e.json()
-                    } {
-                        let e = document.querySelectorAll(`[tag-id="${t}"]`);
-                        for (let t of e) t.remove()
-                    }
-                } catch (e) {
-                    alert("Impossible de supprimer le tag"), console.error(e)
-                }
-                document.getElementById("addAndEditTagModal").classList.remove("is-active")
+
+// on objet qui contient des fonctions
+var app = {
+  // l'url "de base" de notre api !
+  // base_url: (document.location.protocol + '//' + document.location.hostname + ':3003'),
+  base_url: "http://localhost:3003",
+
+
+
+  // fonction d'initialisation, lancée au chargement de la page
+  init: function () {
+    listModule.setBaseUrl(app.base_url);
+    cardModule.setBaseUrl(app.base_url);
+    tagModule.setBaseUrl(app.base_url);
+
+    //console.log('app.init !');
+    app.addListenerToActions();
+
+    // chargement depuis l'API
+    app.getListsFromAPI();
+
+  },
+
+  // ajoute les écouteurs aux boutons statiques et aux formulaires
+  addListenerToActions: () => {
+    // bouton "ajouter une liste"
+    let addListButton = document.getElementById('addListButton');
+    addListButton.addEventListener('click', listModule.showAddModal);
+
+    // boutons "fermer les modales"
+    let closeModalButtons = document.querySelectorAll('.close');
+    for (let button of closeModalButtons) {
+      button.addEventListener('click', app.hideModals);
+    }
+
+    // formulaire "ajouter une liste"
+    let addListForm = document.querySelector('#addListModal form');
+    addListForm.addEventListener('submit', app.handleAddListForm);
+
+    // boutons "ajouter une carte" => plus besoin, les écouteur sont créés directement dans le module
+
+    // formulaire "ajouter une carte"
+    let addCardForm = document.querySelector('#addCardModal form');
+    addCardForm.addEventListener('submit', app.handleAddCardForm);
+
+    // modale "gérer les tags"
+    document.getElementById('editTagsButton').addEventListener('click', tagModule.showEditModal);
+
+    // formulaire "nouveau tag"
+    document.getElementById('newTagForm').addEventListener('submit', tagModule.handleNewTag);
+  },
+
+  // cache toutes les modales
+  hideModals: () => {
+    let modals = document.querySelectorAll('.modal');
+    for (let modal of modals) {
+      modal.classList.remove('is-active');
+    }
+  },
+
+  // action formulaire : ajouter une liste
+  handleAddListForm: async (event) => {
+    event.preventDefault();
+    await listModule.handleAddFormSubmit(event);
+    // on ferme les modales !
+    app.hideModals();
+  },
+
+  // action formulaire : ajouter une carte
+  handleAddCardForm: async (event) => {
+    // on empeche le rechargement de la page
+    event.preventDefault();
+
+    await cardModule.handleAddFormSubmit(event);
+
+    // et on ferme les modales !
+    app.hideModals();
+  },
+
+  /** Fonctions de récupération des données */
+  getListsFromAPI: async () => {
+    try {
+      let response = await fetch(app.base_url + "/lists");
+      // on teste le code HTTP
+      if (response.status !== 200) {
+        // si pas 200 => problème.
+        // on récupère le corps de la réponse, et on le "throw" => il tombera dans le catch jsute après
+        let error = await response.json();
+        throw error;
+      } else {
+        // si tout c'est bien passé : on passe à la création des listes dans le DOM
+        let lists = await response.json();
+        // console.log(lists);
+        for (let list of lists) {
+          let listElement = listModule.makeListDOMObject(list.name, list.id);
+          listModule.addListToDOM(listElement);
+
+          // on a modifié la route de l'api pour inclure directement les cartes !
+          for (let card of list.cards) {
+            let cardElement = cardModule.makeCardDOMObject(card.content, card.id, card.color);
+            cardModule.addCardToDOM(cardElement, list.id);
+
+            // et on continue : on ajout les tags !
+            for (let tag of card.tags) {
+              let tagElement = tagModule.makeTagDOMObject(tag.name, tag.color, tag.id, card.id);
+              tagModule.addTagToDOM(tagElement, card.id);
             }
-        };
-        t.exports = r
-    }, {}]
-}, {}, [1]);
+          }
+        }
+      }
+
+      // on appelle le plugin SortableJS !
+      let container = document.querySelector('.card-lists');
+      new Sortable(container, {
+        group: "project",
+        draggable: ".panel",
+        onEnd: listModule.handleDropList
+      });
+    } catch (error) {
+      // en cas d'erreur, on affiche un message à l'utilisateur
+      alert("Impossible de charger les listes depuis l'API.");
+      // et on log l'erreur en console pour plus de détails
+      console.error(error);
+    }
+  }
+
+};
+
+
+// on accroche un écouteur d'évènement sur le document : quand le chargement est terminé, on lance app.init
+document.addEventListener('DOMContentLoaded', app.init);
+},{"./card":2,"./list":3,"./tag":4}],2:[function(require,module,exports){
+
+const tagModule = require('./tag');
+
+const cardModule = {
+  base_url: null,
+
+  setBaseUrl: (url) => {
+    cardModule.base_url = url + '/cards';
+  },
+
+  showAddModal: (event) => {
+    // event.target contient la cible du click
+    let listElement = event.target.closest('.panel');
+    console.log("listElement => ",listElement);
+    // on récupère l'id de la liste cible
+    const listId = listElement.getAttribute('list-id');
+
+    let modal = document.getElementById('addCardModal');
+    // on récupère l'input 
+    let input = modal.querySelector('input[name="list_id"]');
+    // on change sa valeur
+    input.value = listId;
+    // on a plus qu'à afficher la modale
+    modal.classList.add('is-active');
+  },
+
+  handleAddFormSubmit: async (event) => {
+    // on récupère les infos dur form
+    let data = new FormData(event.target);
+
+    for (const pair of data.entries()) {
+      console.log("les clés - valeurs de mon formdata => ", pair[0]+ ', ' + pair[1])}
+
+    try {
+      let response = await fetch(cardModule.base_url, {
+        method: "POST",
+        body: data
+      });
+      if (response.status != 200) {
+        let error = await response.json();
+        throw error;
+      } else {
+        let card = await response.json();
+        // et on les passe à la bonne méthode
+        let newCardElement = cardModule.makeCardDOMObject(card.content, card.id, card.color);
+        cardModule.addCardToDOM(newCardElement, card.list_id);
+      }
+    } catch (error) {
+      alert("Impossible de créer une carte");
+      console.error(error);
+    }
+  },
+
+  showEditForm: (event) => {
+    // récupérer tous les éléments
+    let cardElement = event.target.closest('.box');
+    let formElement = cardElement.querySelector('form');
+    let contentElement = cardElement.querySelector('.card-name');
+
+    // mettre la valeur existante dans l'input
+    formElement.querySelector('input[name="content"]').value = contentElement.textContent;
+    // petit souci : element.style.backgroundColor renvoie une couleur au format rbg
+    // alors que input.value attend la couleur au format hexa
+    // il faut donc transformer du RBG en hexa => on google le truc, et on copie-colle une fonction dans le module.
+    formElement.querySelector('input[name="color"]').value = cardModule.rgb2hex(cardElement.style.backgroundColor);
+
+    // afficher/masquer
+    contentElement.classList.add('is-hidden');
+    formElement.classList.remove('is-hidden');
+  },
+
+  handleEditCardForm: async (event) => {
+    event.preventDefault();
+
+    // récupérer les données
+    let data = new FormData(event.target);
+    // récupérer l'id de la liste
+    let cardElement = event.target.closest('.box');
+    const cardId = cardElement.getAttribute('card-id');
+    //appeler l'API
+    try {
+      let response = await fetch(cardModule.base_url + '/' + cardId, {
+        method: "PATCH",
+        body: data
+      });
+      if (response.status !== 200) {
+        let error = await response.json();
+        throw error;
+      } else {
+        let card = await response.json();
+        // on met à jour le h2
+        cardElement.querySelector('.card-name').textContent = card.content;
+        // et la couleur
+        cardElement.style.backgroundColor = card.color;
+      }
+    } catch (error) {
+      alert("Impossible de modifier la carte");
+      console.error(error);
+    }
+    // quoi qu'il se passe, on cache le formulaire
+    event.target.classList.add('is-hidden');
+    // et on réaffiche le content
+    cardElement.querySelector('.card-name').classList.remove('is-hidden');
+  },
+
+  makeCardDOMObject: (cardContent, cardId, cardColor) => {
+    // récupérer le template
+    let template = document.getElementById('template-card');
+    // créer une nouvelle copie
+    let newCard = document.importNode(template.content, true);
+    // changer les valeurs qui vont bien
+    newCard.querySelector('.card-name').textContent = cardContent;
+    let box = newCard.querySelector('.box');
+    box.setAttribute('card-id', cardId);
+    box.setAttribute('style', 'background-color: ' + cardColor);
+    // ajouter les eventListener
+    newCard.querySelector('.button--edit-card').addEventListener('click', cardModule.showEditForm);
+    newCard.querySelector('form').addEventListener('submit', cardModule.handleEditCardForm);
+    newCard.querySelector('.button--delete-card').addEventListener('click', cardModule.deleteCard);
+    newCard.querySelector('.button--add-tag').addEventListener('click', tagModule.showAssociateModal);
+
+    return newCard;
+  },
+
+  addCardToDOM: (newCard, listId) => {
+    // insérer la nouvelle carte dans la bonne liste
+    let theGoodList = document.querySelector(`[list-id="${listId}"]`);
+    theGoodList.querySelector('.panel-block').appendChild(newCard);
+  },
+
+  deleteCard: async (event) => {
+    // confirmation utilisateur
+    if (!confirm("Supprimer cette carte ?")) {
+      return;
+    }
+    let cardElement = event.target.closest('.box');
+    const cardId = cardElement.getAttribute('card-id');
+    try {
+      let response = await fetch(cardModule.base_url + '/' + cardId, {
+        method: "DELETE"
+      });
+      if (response.ok) {
+        cardElement.remove();
+      } else {
+        let error = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      alert("Impossible de supprimer la carte");
+      console.error(error);
+    }
+  },
+
+
+  rgb2hex: (color) => {
+    if (color.charAt(0) === '#') {
+      return color;
+    }
+    let rgb = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?\)$/);
+
+    function hex(x) {
+      return ("0" + parseInt(x).toString(16)).slice(-2);
+    }
+    return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+  }
+
+};
+
+module.exports = cardModule;
+},{"./tag":4}],3:[function(require,module,exports){
+const cardModule = require('./card');
+ /* const Sortable = require("sortablejs"); */
+
+
+const listModule = {
+  base_url: null,
+
+  setBaseUrl: (url) => {
+    listModule.base_url = url + '/lists';
+  },
+
+  showAddModal: () => {
+    let modal = document.getElementById('addListModal');
+    modal.classList.add('is-active');
+  },
+
+  handleAddFormSubmit: async (event) => {
+    // event.target contiendra toujours le formulaire
+    let data = new FormData(event.target);
+
+    // pour éviter "page_order can not be empty"
+    let nbListes = document.querySelectorAll('.panel').length;
+    data.set('page_order', nbListes);
+
+    try {
+      let response = await fetch(listModule.base_url, {
+        method: "POST",
+        body: data
+      });
+      if (response.status !== 200) {
+        let error = await response.json();
+        throw error;
+      } else {
+        const list = await response.json();
+        // on appelle la méthode de création avec les bons paramètres.
+        let newList = listModule.makeListDOMObject(list.name, list.id);
+        listModule.addListToDOM(newList);
+      }
+    } catch (error) {
+      alert("Impossible de créer une liste");
+      console.error(error);
+    }
+  },
+
+  showEditForm: (event) => {
+    // récupérer tous les éléments
+    let listElement = event.target.closest('.panel');
+    let formElement = listElement.querySelector('form');
+
+    // mettre la valeur existante dans l'input
+    formElement.querySelector('input[name="name"]').value = event.target.textContent;
+
+    // afficher/masquer
+    event.target.classList.add('is-hidden');
+    formElement.classList.remove('is-hidden');
+  },
+
+  handleEditListForm: async (event) => {
+    event.preventDefault();
+
+    // récupérer les données
+    let data = new FormData(event.target);
+    // récupérer l'id de la liste
+    let listElement = event.target.closest('.panel');
+    const listId = listElement.getAttribute('list-id');
+    //appeler l'API
+    try {
+      let response = await fetch(listModule.base_url + '/' + listId, {
+        method: "PATCH",
+        body: data
+      });
+      if (response.status !== 200) {
+        let error = await response.json();
+        throw error;
+      } else {
+        let list = await response.json();
+        // on met à jour le h2
+        listElement.querySelector('h2').textContent = list.name;
+      }
+    } catch (error) {
+      alert("Impossible de modifier la liste");
+      console.error(error);
+    }
+    // quoi qu'il se passe, on cache le formulaire
+    event.target.classList.add('is-hidden');
+    // et on réaffiche le <h2>
+    listElement.querySelector('h2').classList.remove('is-hidden');
+  },
+
+  makeListDOMObject: (listName, listId) => {
+    // récupérer le template
+    let template = document.getElementById('template-list');
+    // créer une nouvelle copie
+    let newList = document.importNode(template.content, true);
+    // changer les valeurs qui vont bien
+    newList.querySelector('h2').textContent = listName;
+    newList.querySelector('.panel').setAttribute('list-id', listId);
+    // ajouter les event Listener !
+    newList.querySelector('.button--add-card').addEventListener('click', cardModule.showAddModal);
+    //!
+    newList.querySelector('h2').addEventListener('dblclick', listModule.showEditForm);
+    newList.querySelector('form').addEventListener('submit', listModule.handleEditListForm);
+    newList.querySelector('.button--delete-list').addEventListener('click', listModule.deleteList);
+
+    // on appelle le plugin SortableJS !
+    let container = newList.querySelector('.panel-block');
+    new Sortable(container, {
+      group: "list",
+      draggable: ".box",
+      onEnd: listModule.handleDropCard
+    });
+
+
+    return newList;
+  },
+
+  addListToDOM: (newList) => {
+    // insérer la nouvelle liste à la fin
+    document.querySelector('.card-lists').append(newList);
+    //on scroll au maximum vers la droite
+    document.querySelector('.card-lists').scrollTo(document.querySelector('.card-lists').offsetWidth, 0);
+  },
+
+  deleteList: async (event) => {
+    let listElement = event.target.closest('.panel');
+    const listId = listElement.getAttribute('list-id');
+    // premier test, la liste est-elle vide?
+    if (listElement.querySelectorAll('.box').length) {
+      alert("Impossible de supprimer une liste non vide");
+      return;
+    }
+    // ensuite, confirmation utilisateur
+    if (!confirm("Supprimer cette liste ?")) {
+      return;
+    }
+    // on appelle l'API
+    try {
+      let response = await fetch(listModule.base_url + '/' + listId, {
+        method: "DELETE"
+      });
+      if (response.ok) {
+        listElement.remove();
+      } else {
+        let error = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      alert("Impossible de supprimer la liste.");
+      console.log(error);
+    }
+  },
+
+  updateAllLists: () => {
+    document.querySelectorAll('.panel').forEach((list, position) => {
+      const listId = list.getAttribute('list-id');
+      let data = new FormData();
+      data.set('position', position);
+      fetch(listModule.base_url + '/' + listId, {
+        method: "PATCH",
+        body: data
+      });
+    });
+  },
+
+  updateAllCards: (cards, listId) => {
+    cards.forEach((card, position) => {
+      const cardId = card.getAttribute('card-id');
+      let data = new FormData();
+      data.set('position', position);
+      data.set('list_id', listId);
+      fetch(cardModule.base_url + '/' + cardId, {
+        method: "PATCH",
+        body: data
+      });
+    });
+  },
+
+  handleDropCard: (event) => {
+    let cardElement = event.item;
+    let originList = event.from;
+    let targetList = event.to;
+
+    // on fait les bourrins : on va re-parcourir les 2 listes, pour mettre à jour chacune des cartes !
+    let cards = originList.querySelectorAll('.box');
+    let listId = originList.closest('.panel').getAttribute('list-id');
+    listModule.updateAllCards(cards, listId);
+
+    if (originList !== targetList) {
+      cards = targetList.querySelectorAll('.box')
+      listId = targetList.closest('.panel').getAttribute('list-id');
+      listModule.updateAllCards(cards, listId);
+    }
+  },
+
+  handleDropList: (event) => {
+    listModule.updateAllLists();
+  }
+
+};
+module.exports = listModule;
+},{"./card":2}],4:[function(require,module,exports){
+
+
+
+const tagModule = {
+  base_url: null,
+
+  setBaseUrl: (url) => {
+    tagModule.base_url = url;
+  },
+
+  makeTagDOMObject: (tagName, tagColor, tagId, cardId) => {
+    let newTag = document.createElement('div');
+    newTag.classList.add('tag');
+    newTag.setAttribute("style","font-weight: bold; color:white");
+    newTag.style.backgroundColor = tagColor;
+    newTag.textContent = tagName;
+    newTag.setAttribute('tag-id', tagId);
+    newTag.setAttribute('card-id', cardId);
+
+    newTag.addEventListener('dblclick', tagModule.disassociateTag);
+
+    return newTag;
+  },
+
+  addTagToDOM: (tagElement, cardId) => {
+    let cardTagsElement = document.querySelector(`[card-id="${cardId}"] .tags`);
+    cardTagsElement.appendChild(tagElement);
+  },
+
+  showAssociateModal: async (event) => {
+    const cardId = event.target.closest('.box').getAttribute('card-id');
+    const modal = document.getElementById('associateTagModal');
+    // on appelle l'api pour avoir la liste des Tags
+    try {
+      let response = await fetch(tagModule.base_url + '/tags');
+      if (response.ok) {
+        let tags = await response.json();
+        let container = document.createElement('section');
+        container.classList.add('modal-card-body');
+        for (let tag of tags) {
+          let tagElement = tagModule.makeTagDOMObject(tag.name, tag.color, tag.id, cardId);
+          tagElement.addEventListener('click', tagModule.handleAssociateTag);
+
+          container.appendChild(tagElement);
+        }
+        modal.querySelector('.modal-card-body').replaceWith(container);
+        modal.classList.add("is-active");
+
+      } else {
+        let error = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      alert("Impossible de récupérer les tags");
+      console.error(error);
+    }
+
+  },
+
+  handleAssociateTag: async (event) => {
+    const tagId = event.target.getAttribute('tag-id');
+    const cardId = event.target.getAttribute('card-id');
+
+    console.log("cardId => ", cardId);
+
+    try {
+      let data = new FormData();
+      data.set('tagid', tagId);
+
+      for (const pair of data.entries()) {
+        console.log("les clés - valeurs de mon formdata => ", pair[0]+ ', ' + pair[1]); 
+    }
+
+      let response = await fetch(tagModule.base_url + `/cards/${cardId}/tags`, {
+        method: "POST",
+        body: data
+      });
+      if (response.ok) {
+        // on recrée tous les tags de la carte, pour s'assurer "facilement" de pas créer de doublons
+        let card = await response.json();
+        // 1 : supprimer les "vieux" tags 
+        let oldTags = document.querySelectorAll(`[card-id="${card.id}"] .tag`);
+        for (let tag of oldTags) {
+          tag.remove();
+        }
+        // 2 : créer les nouveaux!
+        let container = document.querySelector(`[card-id="${card.id}"] .tags`);
+        for (let tag of card.tags) {
+          let tagElement = tagModule.makeTagDOMObject(tag.name, tag.color, tag.id, card.id);
+          container.appendChild(tagElement);
+        }
+
+      } else {
+        let error = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      alert("Impossible d'associer le tag");
+      console.error(error);
+    }
+    const modal = document.getElementById('associateTagModal');
+    modal.classList.remove('is-active');
+  },
+
+  disassociateTag: async (event) => {
+    const tagId = event.target.getAttribute('tag-id');
+    const cardId = event.target.getAttribute('card-id');
+    try {
+      let response = await fetch(tagModule.base_url + `/cards/${cardId}/tags/${tagId}`, {
+        method: "DELETE"
+      });
+      if (response.ok) {
+        // on a rien à faire, sauf supprimer le tag !
+        event.target.remove();
+      } else {
+        let error = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      alert('Impossible de désassocier le tag'),
+        console.error(error);
+    }
+  },
+
+  makeEditTagForm: (tag) => {
+    let orignalForm = document.getElementById('newTagForm');
+    let newForm = document.importNode(orignalForm, true);
+    // on enlève l'id
+    newForm.setAttribute('id', null);
+    // on ajoute une classe
+    newForm.classList.add('editTagForm');
+    // on regle les input
+    newForm.querySelector('[name="name"]').value = tag.name;
+    newForm.querySelector('[name="color"]').value = tag.color;
+    console.log(tag.color, newForm.querySelector('[name="color"]').value);
+    // on rajoute un attribut pour l'id du tag
+    newForm.setAttribute('tag-id', tag.id);
+    // et un event listener pour le submit
+    newForm.addEventListener('submit', tagModule.handleEditTag);
+    // on rajoute un bouton "supprimer"
+    let deleteButton = document.createElement('div');
+    deleteButton.classList.add("button", "is-small", "is-danger");
+    deleteButton.textContent = "Supprimer";
+    deleteButton.addEventListener('click', tagModule.handleDeleteTag);
+
+    newForm.querySelector(".field").appendChild(deleteButton);
+
+    return newForm;
+  },
+
+  showEditModal: async () => {
+    // on récupère les tags depuis l'API
+    try {
+
+      let response = await fetch(tagModule.base_url + '/tags');
+
+      const modal = document.getElementById('addAndEditTagModal');
+
+      let tags = await response.json();
+      let container = document.createElement('div');
+      container.classList.add('editTagForms');
+      for (let tag of tags) {
+        let editFormElement = tagModule.makeEditTagForm(tag);
+        container.appendChild(editFormElement);
+      }
+      modal.querySelector('.editTagForms').replaceWith(container);
+
+      modal.classList.add('is-active');
+
+    } catch (error) {
+      alert("Impossible de récupérer les tags");
+      console.error(error);
+    }
+  },
+
+  handleNewTag: async (event) => {
+    event.preventDefault();
+    let data = new FormData(event.target);
+    try {
+      let response = await fetch(tagModule.base_url + '/tags', {
+        method: "POST",
+        body: data
+      });
+      if (response.ok) {
+        // ba rien! y'a rien à faire.
+      } else {
+        let error = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      alert("Impossible de créer le tag");
+      console.error(error);
+    }
+    // on ferme la modale
+    document.getElementById('addAndEditTagModal').classList.remove('is-active');
+  },
+
+  handleEditTag: async (event) => {
+    event.preventDefault();
+    let data = new FormData(event.target);
+
+    let tagId = event.target.getAttribute('tag-id');
+    try {
+      let response = await fetch(tagModule.base_url + '/tags/' + tagId, {
+        method: "PATCH",
+        body: data
+      });
+      if (response.ok) {
+        let tag = await response.json();
+        // on récupère toutes les occurences existantes du tag
+        let existingOccurences = document.querySelectorAll(`[tag-id="${tag.id}"]`);
+        for (let occurence of existingOccurences) {
+          // et on les met à jour
+          occurence.textContent = tag.name;
+          occurence.style.backgroundColor = tag.color;
+        }
+
+      } else {
+        let error = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      alert('Impossible de mettre le tag à jour');
+      console.error(error);
+    }
+    // on ferme la modale
+    document.getElementById('addAndEditTagModal').classList.remove('is-active');
+  },
+
+  handleDeleteTag: async (event) => {
+    const tagId = event.target.closest('form').getAttribute('tag-id');
+    try {
+      let response = await fetch(tagModule.base_url + '/tags/' + tagId, {
+        method: "DELETE"
+      });
+      if (response.ok) {
+        // on récupère toutes les occurences du tag
+        let existingOccurences = document.querySelectorAll(`[tag-id="${tagId}"]`);
+        // et on les supprime !
+        for (let occurence of existingOccurences) {
+          occurence.remove();
+        }
+      } else {
+        let error = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      alert("Impossible de supprimer le tag");
+      console.error(error);
+    }
+    // on ferme la modale
+    document.getElementById('addAndEditTagModal').classList.remove('is-active');
+  }
+};
+module.exports = tagModule;
+},{}]},{},[1]);
