@@ -23,22 +23,23 @@ app.use((_, res, next) => {
   next();
 });
 
-app.use(helmet()); 
+ app.use(helmet()); 
 
 // CSP configuration and headers security
 app.use(helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: [`'self'`,], 
       "script-src": [(_, res) => `'nonce-${res.locals.nonce}'`],
-      "img-src": [`'self'`],
+      "script-src-elem":[`'unsafe-inline'`,`'self'`,(_, res) => `'nonce-${res.locals.nonce}'`,"https://use.fontawesome.com/releases/v5.3.1/js/all.js", "https://cdn.jsdelivr.net/npm/vanta@0.5.21/dist/vanta.topology.min.js", "https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.min.js"],
+      "img-src": [`'self'`, `https://filedn.eu/lD5jpSv048KLfgLMlwC2cLz/ForkMe.png`],
       
-      "style-src": [ `'self'`], //
+      "style-src": [ `'self'`, `'unsafe-inline'`, "https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" ], //
       "base-uri": ["'none'"],
       "object-src":["'none'"],
     
       upgradeInsecureRequests: [] 
     }
-  }))
+  })) 
 
 app.use((req, res, next) => {
   res.setHeader(
