@@ -8,7 +8,7 @@ const Sortable = require("sortablejs");
 var app = {
   // l'url "de base" de notre api !
   base_url: (document.location.protocol + '//' + document.location.hostname),
-  //base_url: "http://localhost:3003",
+  //base_url: "http://localhost:<your_port>",
 
 
   // fonction d'initialisation, lancée au chargement de la page
