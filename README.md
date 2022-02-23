@@ -24,7 +24,7 @@ and drag and drop your lists to another card if you wish !
 
 => Go to BACK/public/app and line 10 or 11, replace the base_url with the chosen port  : ```base_url: "http://localhost:<your_port>",```
 
-=> Run ```npm run build```
+=> Run ```npm run build``` (```npm i browserify``` if you have => ```sh: 1: browserify: not found```)
 
 => Run ```npm start```
 
