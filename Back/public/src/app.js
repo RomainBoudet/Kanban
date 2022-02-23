@@ -1,15 +1,16 @@
  const cardModule = require('./card');
  const listModule = require('./list');
  const tagModule = require('./tag');
-/*  const Sortable = require("sortablejs"); */
+const Sortable = require("sortablejs");
 
 
 // on objet qui contient des fonctions
 var app = {
   // l'url "de base" de notre api !
-  // base_url: (document.location.protocol + '//' + document.location.hostname + ':3003'),
-  base_url: "http://localhost:3003",
-
+  // pour tourner en production :
+  base_url: (document.location.protocol + '//' + document.location.hostname),
+  // pour tourner en local :
+  //base_url: "http://localhost:5010",
 
 
   // fonction d'initialisation, lancée au chargement de la page

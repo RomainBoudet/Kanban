@@ -5,42 +5,63 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Kanban</title>
+<<<<<<< HEAD
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" integrity="<%=locals.nonce%>" crossorigin="anonymous">
     <link rel="stylesheet" href="./css/style.css" integrity="<%=locals.nonce%>" crossorigin="anonymous">
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js" nonce="<%=locals.nonce%>" crossorigin="anonymous"></script>
+=======
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"
+        integrity="<%=locals.nonce%>" crossorigin="anonymous">
+    <link rel="stylesheet" href="./css/style.css" integrity="<%=locals.nonce%>" crossorigin="anonymous">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js" nonce="<%=locals.nonce%>"
+        crossorigin="anonymous"></script>
+    <!-- Vantas.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.min.js" nonce="<%=locals.nonce%>"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.21/dist/vanta.topology.min.js" nonce="<%=locals.nonce%>"
+        crossorigin="anonymous"></script>
+
+>>>>>>> prod
     <link rel="apple-touch-icon" sizes="180x180" href="./favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="./favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="./favicon/favicon-16x16.png">
 </head>
 
-<body>
+<body id="vantajs">
+
     <div class="opacity">
         <section class="section ">
             <div class="opacity">
                 <div class="container">
+<<<<<<< HEAD
                     <h1 class="title">
                         Kanban Yosemite Valley
                     </h1>
+=======
+
+                    <div class="flexcontainer">
+
+                        <button class="button is-success" id="addListButton">
+                            <span class="icon is-small">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            &nbsp; Ajouter une liste
+                        </button>
+                        <h1 class="title">
+                            Kanban
+                        </h1>
+                        <button class="button is-success" id="editTagsButton">
+                            <span class="icon is-small">
+                                <i class="fas fa-pencil-alt"></i>
+                            </span>
+                            &nbsp; Gérer les tags
+                        </button>
+                    </div>
+>>>>>>> prod
                     <div class="columns">
                         <div class="column is-full">
                             <div class="card-lists columns">
                             </div>
-                        </div>
-                        <div class="column">
-                            <button class="button is-success" id="addListButton">
-                                <span class="icon is-small">
-                                    <i class="fas fa-plus"></i>
-                                </span>
-                                &nbsp; Ajouter une liste
-                            </button>
-                            <br>
-                            <br>
-                            <button class="button is-success" id="editTagsButton">
-                                <span class="icon is-small">
-                                    <i class="fas fa-pencil-alt"></i>
-                                </span>
-                                &nbsp; Gérer les tags
-                            </button>
                         </div>
 
                     </div>
@@ -154,16 +175,21 @@
             </div>
         </div>
 
+
+
+
         <!-- Chargement de mon fichier JS -->
-         <script src="./js/bundle.js"></script> 
-       <!--   <script src="./src/app.js"></script>
+        <script src="./js/bundle.js"></script>
+        <script src="./js/vanta.js"></script>
+
+        <!--<script src="./src/app.js"></script>
         <script src="./src/list.js"></script>
         <script src="./src/card.js"></script>
         <script src="./src/tag.js"></script>  -->
+
+        <!-- On passe par browserify, plus besoin de CDN ! -->
         <!-- Le plugin SortableJS -->
-
-        <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-
+        <!--<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>-->
 
         <!-- Mes templates -->
         <template id="template-list">
@@ -258,6 +284,14 @@
 
 
     </div>
+
+    <a href="https://github.com/RomainBoudet/Kanban" target="_blank">
+        <img style="position: absolute; z-index: 2000; top: 0; right: 0; border: 0;"
+            src="https://filedn.eu/lD5jpSv048KLfgLMlwC2cLz/ForkMe.png" alt="Fork me on GitHub link"
+            data-canonical-src="https://filedn.eu/lD5jpSv048KLfgLMlwC2cLz/ForkMe.png">
+    </a>
+    <a style=" position: absolute; z-index: 2000; top: 10px; left: 10px; border: 0; width: 100px; "
+        href="https://romainboudet.fr" target="_blank"><img src="./img/RB.png" alt="logo RB"></a>
 
 </body>
 

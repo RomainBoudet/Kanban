@@ -7,9 +7,10 @@ const tagController = require('./controllers/tagController');
 
 const router = express.Router();
 
- router.get('/', (req, res) => {
+//A la racine on a nos fichiers static !
+ /* router.get('/', (req, res) => {
   res.send('On est bien branché sur l\'API :)');
-}); //on envoi le front désormais via app.use(express.static('public')); présent dans l'index :)
+}); */ //on envoi le front désormais via app.use(express.static('public')); présent dans l'index :)
 
 /** Lists */
 router.get('/lists', listController.getAllLists);
@@ -37,7 +38,7 @@ router.post('/cards/:id/tags', tagController.associateTagToCard);
 router.delete('/cards/:cardId/tags/:tagId', tagController.removeTagFromCard);
 
 router.use((req, res) => {
-  res.status(404).send('Service does not exists\nSee : https://doc.localhost.api');
+  res.status(404).send('Service does not exists !');
 });
 
 module.exports = router;

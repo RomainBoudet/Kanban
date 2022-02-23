@@ -2,19 +2,22 @@
   "name": "okanban",
   "version": "1.0.0",
   "description": "## jour 4 : Implémentation",
-  "main": "test.js",
+  "main": "index.js",
   "directories": {
     "doc": "doc"
   },
   "dependencies": {
+    "browserify": "^17.0.0",
     "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "helmet": "^4.6.0",
-    "multer": "^1.4.2",
-    "nodemon": "^2.0.7",
-    "pg": "^8.5.1",
-    "sequelize": "^5.22.3"
+    "multer": "^1.4.4",
+    "nodemon": "^2.0.15",
+    "pg": "^8.7.1",
+    "sequelize": "^6.12.0-beta.2",
+    "sortablejs": "^1.14.0",
+    "spdy": "^4.0.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -23,13 +26,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/O-clock-FS-JS/oKanban.git"
+    "url": "git+https://github.com/RomainBoudet/Kanban"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/O-clock-FS-JS/oKanban/issues"
-  },
-  "homepage": "https://github.com/O-clock-FS-JS/oKanban#readme"
+  "homepage": "https://github.com/RomainBoudet/Kanban/blob/main/README.md"
 }
