@@ -6,11 +6,9 @@ const multer = require('multer');
 const upload = multer();
 const express = require('express');
 const crypto = require("crypto");
-const helmet = require('helmet');
 const router = require('./app/router');
 
 const helmet = require('helmet');
-const crypto = require("crypto");
 
 
 // Je require le middleware pour dire a express 
