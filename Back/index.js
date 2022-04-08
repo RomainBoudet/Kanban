@@ -6,8 +6,9 @@ const multer = require('multer');
 const upload = multer();
 const express = require('express');
 const crypto = require("crypto");
-const helmet = require('helmet');
 const router = require('./app/router');
+
+const helmet = require('helmet');
 
 
 // Je require le middleware pour dire a express 
@@ -23,7 +24,8 @@ app.use((_, res, next) => {
   next();
 });
 
- app.use(helmet()); 
+
+//app.use(helmet()); 
 
 // CSP configuration and headers security
 app.use(helmet.contentSecurityPolicy({
@@ -41,21 +43,10 @@ app.use(helmet.contentSecurityPolicy({
     }
   })) 
 
-app.use((req, res, next) => {
-  res.setHeader(
-    "Permissions-Policy",
-    "geolocation=(), fullscreen=(), autoplay=(), camera=(), display-capture=(), document-domain=(), fullscreen=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), sync-xhr=(), usb=(), screen-wake-lock=(), xr-spatial-tracking=()"
-  );
-    res.setHeader("X-XSS-Protection", "1; mode=block");
-    next();
-  });
-
-app.set('x-powered-by', false);
-
 app.use(cors({
   optionsSuccessStatus: 200,
   credentials: true, // pour envoyer des cookies et des en-têtes d'autorisations faut rajouter une autorisation avec l'option credential
-  origin: "*",//! a pas oublier pour la prod ! => remplacer par le bon nom de domaine
+  origin: "https://apikanban.romainboudet.fr",//! a pas oublier pour la prod ! => remplacer par le bon nom de domaine
   methods: "GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS", // ok via un array aussi
   allowedHeaders: ['Content-Type'],
 }));
@@ -63,8 +54,8 @@ app.use(cors({
 
 
 app.use(upload.array());
-app.use((req, res, next) => {
 
+app.use((req, res, next) => {
   console.log('Server received req.params : ', req.params);
   next();
 }); 
