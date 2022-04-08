@@ -38,7 +38,7 @@ router.post('/cards/:id/tags', tagController.associateTagToCard);
 router.delete('/cards/:cardId/tags/:tagId', tagController.removeTagFromCard);
 
 router.use((req, res) => {
-  res.status(404).send('Service does not exists !');
+  res.status(404).send('Oups... ce service n\'éxiste pas !');
 });
 
 module.exports = router;

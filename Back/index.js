@@ -46,7 +46,7 @@ app.use(helmet.contentSecurityPolicy({
 app.use(cors({
   optionsSuccessStatus: 200,
   credentials: true, // pour envoyer des cookies et des en-têtes d'autorisations faut rajouter une autorisation avec l'option credential
-  origin: "https://apikanban.romainboudet.fr",//! a pas oublier pour la prod ! => remplacer par le bon nom de domaine
+  origin: "https://apikanban.romainboudet.fr",
   methods: "GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS", // ok via un array aussi
   allowedHeaders: ['Content-Type'],
 }));
@@ -54,11 +54,6 @@ app.use(cors({
 
 
 app.use(upload.array());
-
-/* app.use((req, res, next) => {
-  console.log('Server received req.params : ', req.params);
-  next();
-}); */ 
 
 
 app.use(express.urlencoded({
@@ -73,17 +68,6 @@ app.use(router);
 
 
 
-// Nginx s'occuperas du HTTP2 ...
-/* const options = {
-  key: fs.readFileSync(process.env.SSL_KEY_FILE),
-  cert: fs.readFileSync(process.env.SSL_CERT_FILE),
-}; */
-
-
  app.listen(port, () => {
   console.log(`API Kanban Yosemite  Listening on ${port} ...`);
 }); 
-
-/* spdy.createServer(options, app).listen(port, () => {
-  console.log(`API Kanban Yosemite  Listening on ${port} ...`);
-}); */
