@@ -55,10 +55,10 @@ app.use(cors({
 
 app.use(upload.array());
 
-app.use((req, res, next) => {
+/* app.use((req, res, next) => {
   console.log('Server received req.params : ', req.params);
   next();
-}); 
+}); */ 
 
 
 app.use(express.urlencoded({
