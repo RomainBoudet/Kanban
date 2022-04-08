@@ -10,7 +10,7 @@ var app = {
   // pour tourner en production :
   //base_url: (document.location.protocol + '//' + document.location.hostname),
   // pour tourner en local :
-  base_url: "http://localhost:5010",
+  base_url: "http://localhost:5001",
 
 
   // fonction d'initialisation, lancée au chargement de la page
